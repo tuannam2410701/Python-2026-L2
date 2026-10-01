@@ -1,95 +1,89 @@
-import curses
 import math
 import numpy as np
 
 
+# Store students, courses and marks
 students = []
 courses = []
 marks = {}
 
 
 # ==========================================
-# STUDENT
+# INPUT STUDENTS
 # ==========================================
 
-def input_students(stdscr):
-    stdscr.clear()
-
-    n = int(input_curses(stdscr, "Enter number of students: "))
+def input_number_of_students():
+    n = int(input("Enter number of students: "))
 
     for i in range(n):
-        stdscr.clear()
+        input_student_information()
 
-        student_id = input_curses(stdscr, "Enter student ID: ")
-        name = input_curses(stdscr, "Enter student name: ")
-        dob = input_curses(stdscr, "Enter date of birth: ")
 
-        student = {
-            "id": student_id,
-            "name": name,
-            "dob": dob
-        }
+def input_student_information():
+    student_id = input("Enter student ID: ")
+    name = input("Enter student name: ")
+    dob = input("Enter date of birth: ")
 
-        students.append(student)
-        marks[student_id] = {}
+    student = {
+        "id": student_id,
+        "name": name,
+        "dob": dob
+    }
 
-    message(stdscr, "Students added successfully!")
+    students.append(student)
+    marks[student_id] = {}
 
 
 # ==========================================
-# COURSE
+# INPUT COURSES
 # ==========================================
 
-def input_courses(stdscr):
-    stdscr.clear()
-
-    n = int(input_curses(stdscr, "Enter number of courses: "))
+def input_number_of_courses():
+    n = int(input("Enter number of courses: "))
 
     for i in range(n):
-        stdscr.clear()
+        input_course_information()
 
-        course_id = input_curses(stdscr, "Enter course ID: ")
-        name = input_curses(stdscr, "Enter course name: ")
-        credit = int(input_curses(stdscr, "Enter number of credits: "))
 
-        course = {
-            "id": course_id,
-            "name": name,
-            "credit": credit
-        }
+def input_course_information():
+    course_id = input("Enter course ID: ")
+    name = input("Enter course name: ")
+    credit = int(input("Enter number of credits: "))
 
-        courses.append(course)
+    course = {
+        "id": course_id,
+        "name": name,
+        "credit": credit
+    }
 
-    message(stdscr, "Courses added successfully!")
+    courses.append(course)
 
 
 # ==========================================
-# MARKS
+# INPUT MARKS
 # ==========================================
 
-def input_marks(stdscr):
+def input_marks():
 
     if len(courses) == 0:
-        message(stdscr, "There are no courses!")
+        print("There are no courses.")
         return
 
-    stdscr.clear()
+    print("\n--- Course List ---")
 
-    stdscr.addstr(0, 0, "COURSE LIST", curses.A_BOLD)
-
-    for i, course in enumerate(courses):
-        stdscr.addstr(
-            i + 2,
-            0,
-            f"{course['id']} - {course['name']} "
-            f"({course['credit']} credits)"
+    for course in courses:
+        print(
+            course["id"],
+            "-",
+            course["name"],
+            "(",
+            course["credit"],
+            "credits)"
         )
 
-    course_id = input_curses(
-        stdscr,
-        "\nEnter course ID: "
-    )
+    course_id = input("Select course ID: ")
 
+    # Find course
     course_found = False
 
     for course in courses:
@@ -98,16 +92,14 @@ def input_marks(stdscr):
             break
 
     if not course_found:
-        message(stdscr, "Course not found!")
+        print("Course not found.")
         return
 
+    # Input mark for every student
     for student in students:
 
         mark = float(
-            input_curses(
-                stdscr,
-                f"Enter mark for {student['name']}: "
-            )
+            input("Enter mark for " + student["name"] + ": ")
         )
 
         # Round DOWN to 1 decimal place
@@ -115,160 +107,91 @@ def input_marks(stdscr):
 
         marks[student["id"]][course_id] = mark
 
-    message(stdscr, "Marks saved successfully!")
+        print("Saved mark:", mark)
 
 
 # ==========================================
 # LIST STUDENTS
 # ==========================================
 
-def list_students(stdscr):
+def list_students():
 
-    stdscr.clear()
-
-    stdscr.addstr(
-        0,
-        0,
-        "STUDENT LIST",
-        curses.A_BOLD
-    )
-
-    row = 2
+    print("\n--- Student List ---")
 
     for student in students:
-
-        stdscr.addstr(
-            row,
-            0,
-            f"ID: {student['id']} | "
-            f"Name: {student['name']} | "
-            f"DoB: {student['dob']}"
+        print(
+            "ID:", student["id"],
+            "| Name:", student["name"],
+            "| DoB:", student["dob"]
         )
-
-        row += 1
-
-    if len(students) == 0:
-        stdscr.addstr(2, 0, "No students.")
-
-    wait_key(stdscr)
 
 
 # ==========================================
 # LIST COURSES
 # ==========================================
 
-def list_courses(stdscr):
+def list_courses():
 
-    stdscr.clear()
-
-    stdscr.addstr(
-        0,
-        0,
-        "COURSE LIST",
-        curses.A_BOLD
-    )
-
-    row = 2
+    print("\n--- Course List ---")
 
     for course in courses:
-
-        stdscr.addstr(
-            row,
-            0,
-            f"ID: {course['id']} | "
-            f"Name: {course['name']} | "
-            f"Credits: {course['credit']}"
+        print(
+            "ID:", course["id"],
+            "| Name:", course["name"],
+            "| Credit:", course["credit"]
         )
-
-        row += 1
-
-    if len(courses) == 0:
-        stdscr.addstr(2, 0, "No courses.")
-
-    wait_key(stdscr)
 
 
 # ==========================================
 # SHOW MARKS
 # ==========================================
 
-def show_marks(stdscr):
+def show_student_marks():
 
-    if len(courses) == 0:
-        message(stdscr, "There are no courses!")
-        return
+    course_id = input("Enter course ID: ")
 
-    stdscr.clear()
-
-    stdscr.addstr(
-        0,
-        0,
-        "COURSE LIST",
-        curses.A_BOLD
-    )
-
-    for i, course in enumerate(courses):
-        stdscr.addstr(
-            i + 2,
-            0,
-            f"{course['id']} - {course['name']}"
-        )
-
-    course_id = input_curses(
-        stdscr,
-        "\nEnter course ID: "
-    )
-
-    course_name = ""
+    course_found = False
 
     for course in courses:
         if course["id"] == course_id:
+            course_found = True
             course_name = course["name"]
             break
 
-    if course_name == "":
-        message(stdscr, "Course not found!")
+    if not course_found:
+        print("Course not found.")
         return
 
-    stdscr.clear()
-
-    stdscr.addstr(
-        0,
-        0,
-        f"MARKS - {course_name}",
-        curses.A_BOLD
-    )
-
-    row = 2
+    print("\n--- Marks for", course_name, "---")
 
     for student in students:
 
         student_id = student["id"]
 
         if course_id in marks[student_id]:
+
             mark = marks[student_id][course_id]
 
-            stdscr.addstr(
-                row,
-                0,
-                f"{student['id']} - "
-                f"{student['name']} : {mark}"
+            print(
+                student["id"],
+                "-",
+                student["name"],
+                ":",
+                mark
             )
+
         else:
-            stdscr.addstr(
-                row,
-                0,
-                f"{student['id']} - "
-                f"{student['name']} : No mark"
+
+            print(
+                student["id"],
+                "-",
+                student["name"],
+                ": No mark"
             )
-
-        row += 1
-
-    wait_key(stdscr)
 
 
 # ==========================================
-# GPA
+# CALCULATE GPA
 # ==========================================
 
 def calculate_gpa(student_id):
@@ -282,20 +205,20 @@ def calculate_gpa(student_id):
 
         if course_id in marks[student_id]:
 
-            mark_list.append(
-                marks[student_id][course_id]
-            )
+            mark = marks[student_id][course_id]
+            credit = course["credit"]
 
-            credit_list.append(
-                course["credit"]
-            )
+            mark_list.append(mark)
+            credit_list.append(credit)
 
     if len(mark_list) == 0:
         return 0
 
+    # Convert lists to numpy arrays
     marks_array = np.array(mark_list)
     credits_array = np.array(credit_list)
 
+    # Weighted average
     gpa = np.average(
         marks_array,
         weights=credits_array
@@ -305,260 +228,107 @@ def calculate_gpa(student_id):
 
 
 # ==========================================
-# SHOW GPA
+# SHOW ALL GPA
 # ==========================================
 
-def show_gpa(stdscr):
+def show_gpa():
 
-    stdscr.clear()
-
-    stdscr.addstr(
-        0,
-        0,
-        "STUDENT GPA",
-        curses.A_BOLD
-    )
-
-    row = 2
+    print("\n--- Student GPA ---")
 
     for student in students:
 
         gpa = calculate_gpa(student["id"])
 
-        stdscr.addstr(
-            row,
-            0,
-            f"{student['id']} - "
-            f"{student['name']} : "
-            f"GPA = {gpa:.2f}"
+        print(
+            student["id"],
+            "-",
+            student["name"],
+            ": GPA =",
+            round(gpa, 2)
         )
 
-        row += 1
-
-    if len(students) == 0:
-        stdscr.addstr(2, 0, "No students.")
-
-    wait_key(stdscr)
-
 
 # ==========================================
-# SORT GPA
+# SORT STUDENTS BY GPA
 # ==========================================
 
-def sort_students_by_gpa(stdscr):
+def sort_students_by_gpa():
 
     students.sort(
-        key=lambda student:
-        calculate_gpa(student["id"]),
+        key=lambda student: calculate_gpa(student["id"]),
         reverse=True
     )
 
-    stdscr.clear()
-
-    stdscr.addstr(
-        0,
-        0,
-        "STUDENTS SORTED BY GPA",
-        curses.A_BOLD
-    )
-
-    row = 2
+    print("\n--- Students sorted by GPA ---")
 
     for student in students:
 
         gpa = calculate_gpa(student["id"])
 
-        stdscr.addstr(
-            row,
-            0,
-            f"{student['id']} - "
-            f"{student['name']} : "
-            f"GPA = {gpa:.2f}"
+        print(
+            student["id"],
+            "-",
+            student["name"],
+            ": GPA =",
+            round(gpa, 2)
         )
-
-        row += 1
-
-    wait_key(stdscr)
-
-
-# ==========================================
-# CURSES INPUT
-# ==========================================
-
-def input_curses(stdscr, text):
-
-    stdscr.addstr(
-        curses.LINES - 2,
-        0,
-        text
-    )
-
-    stdscr.refresh()
-
-    curses.echo()
-
-    value = stdscr.getstr(
-        curses.LINES - 1,
-        0
-    ).decode("utf-8")
-
-    curses.noecho()
-
-    return value
-
-
-# ==========================================
-# MESSAGE
-# ==========================================
-
-def message(stdscr, text):
-
-    stdscr.clear()
-
-    stdscr.addstr(
-        2,
-        2,
-        text,
-        curses.A_BOLD
-    )
-
-    wait_key(stdscr)
-
-
-# ==========================================
-# WAIT
-# ==========================================
-
-def wait_key(stdscr):
-
-    stdscr.addstr(
-        curses.LINES - 2,
-        2,
-        "Press any key to continue..."
-    )
-
-    stdscr.refresh()
-    stdscr.getch()
 
 
 # ==========================================
 # MAIN MENU
 # ==========================================
 
-def main(stdscr):
-
-    curses.curs_set(0)
-
-    menu = [
-        "Input students",
-        "Input courses",
-        "Input marks",
-        "List students",
-        "List courses",
-        "Show student marks",
-        "Show GPA",
-        "Sort students by GPA",
-        "Exit"
-    ]
-
-    current = 0
+def main():
 
     while True:
 
-        stdscr.clear()
+        print("\n")
+        print("====================================")
+        print("      STUDENT MARK MANAGEMENT")
+        print("====================================")
+        print("1. Input students")
+        print("2. Input courses")
+        print("3. Input marks")
+        print("4. List students")
+        print("5. List courses")
+        print("6. Show student marks")
+        print("7. Calculate GPA")
+        print("8. Sort students by GPA")
+        print("0. Exit")
+        print("====================================")
 
-        # Title
-        stdscr.addstr(
-            1,
-            5,
-            "STUDENT MARK MANAGEMENT",
-            curses.A_BOLD
-        )
+        choice = input("Enter your choice: ")
 
-        stdscr.addstr(
-            2,
-            5,
-            "Practical Work 3",
-            curses.A_BOLD
-        )
+        if choice == "1":
+            input_number_of_students()
 
-        # Menu
-        for i, item in enumerate(menu):
+        elif choice == "2":
+            input_number_of_courses()
 
-            if i == current:
+        elif choice == "3":
+            input_marks()
 
-                stdscr.addstr(
-                    5 + i,
-                    5,
-                    "> " + item,
-                    curses.A_REVERSE
-                )
+        elif choice == "4":
+            list_students()
 
-            else:
+        elif choice == "5":
+            list_courses()
 
-                stdscr.addstr(
-                    5 + i,
-                    5,
-                    "  " + item
-                )
+        elif choice == "6":
+            show_student_marks()
 
-        stdscr.addstr(
-            curses.LINES - 2,
-            5,
-            "Use UP/DOWN to move, ENTER to select"
-        )
+        elif choice == "7":
+            show_gpa()
 
-        key = stdscr.getch()
+        elif choice == "8":
+            sort_students_by_gpa()
 
-        # Move up
-        if key == curses.KEY_UP:
+        elif choice == "0":
+            print("Goodbye!")
+            break
 
-            current -= 1
-
-            if current < 0:
-                current = len(menu) - 1
-
-        # Move down
-        elif key == curses.KEY_DOWN:
-
-            current += 1
-
-            if current >= len(menu):
-                current = 0
-
-        # Enter
-        elif key == curses.KEY_ENTER or key in [10, 13]:
-
-            if current == 0:
-                input_students(stdscr)
-
-            elif current == 1:
-                input_courses(stdscr)
-
-            elif current == 2:
-                input_marks(stdscr)
-
-            elif current == 3:
-                list_students(stdscr)
-
-            elif current == 4:
-                list_courses(stdscr)
-
-            elif current == 5:
-                show_marks(stdscr)
-
-            elif current == 6:
-                show_gpa(stdscr)
-
-            elif current == 7:
-                sort_students_by_gpa(stdscr)
-
-            elif current == 8:
-                break
+        else:
+            print("Invalid choice!")
 
 
-# ==========================================
-# START PROGRAM
-# ==========================================
-
-curses.wrapper(main)
+main()
